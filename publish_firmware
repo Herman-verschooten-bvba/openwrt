@@ -1,0 +1,67 @@
+#!/bin/bash
+
+BRANCH=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+
+while getopts "a:r:" OPTION
+do
+  case $OPTION in
+  a)
+    ARCH=$OPTARG
+    ;;
+  r)
+    BRANCH=$OPTARG
+  ;;
+  ?)
+    exit
+    ;;
+  esac
+done
+
+VERSION=1804
+
+if [ -z $ARCH ]
+then
+  echo  Architecture niet opgegeven!
+  exit
+fi
+
+currdir=$(pwd)
+cd ~/Projects/openwrt/bin/targets/$ARCH/generic
+pwd
+server="gratwifi:apps/gratwifi/current/public/files"
+case $BRANCH in
+  v2)
+    server="api:/var/www/dl/firmwares"
+    ;;
+  * )
+esac
+echo "server: $server"
+
+case $ARCH in
+  ar71xx)
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v1-squashfs-factory.bin $server/firmware-$VERSION-tl-wr1043nd-v1.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v2-squashfs-factory.bin $server/firmware-$VERSION-tl-wr1043nd-v2.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v3-squashfs-factory.bin $server/firmware-$VERSION-tl-wr1043nd-v3.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v4-squashfs-factory.bin $server/firmware-$VERSION-tl-wr1043nd-v4.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043n-v5-squashfs-factory.bin $server/firmware-$VERSION-tl-wr1043n-v5.bin
+    # scp gratwifi-ar71xx-generic-esr900-squashfs-factory.dlf $server/firmware-$VERSION-esr900.dlf
+    scp gratwifi-ar71xx-generic-archer-c5-v1-squashfs-factory.bin $server/firmware-$VERSION-tl-ac1200-v1.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-wr1043nd-v1.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v2-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-wr1043nd-v2.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v3-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-wr1043nd-v3.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043nd-v4-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-wr1043nd-v4.bin
+    scp gratwifi-ar71xx-generic-tl-wr1043n-v5-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-wr1043n-v5.bin
+    # scp gratwifi-ar71xx-generic-esr900-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-esr900.bin
+    scp gratwifi-ar71xx-generic-archer-c5-v1-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-ac1200-v1.bin
+    ;;
+  bcm53xx)
+    scp gratwifi-bcm53xx-tplink-archer-c5-v2-squashfs.bin $server/firmware-$VERSION-tl-ac1200-v2.bin
+    ;;
+  ath79)
+    scp gratwifi-ath79-generic-dlink_dir-842-c3-squashfs-factory.bin $server/firmware-$VERSION-dlink_dir-842-c3.bin
+    scp gratwifi-ath79-generic-dlink_dir-842-c3-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-dlink_dir-842-c3.bin
+    scp gratwifi-ath79-generic-tplink_archer-c7-v5-squashfs-factory.bin $server/firmware-$VERSION-tl-c7-v5.bin
+    scp gratwifi-ath79-generic-tplink_archer-c7-v5-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-c7-v5.bin
+esac
+
+cd $currdir

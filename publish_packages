@@ -1,0 +1,76 @@
+#!/bin/bash
+
+#ARCH=$(~/Projects/openwrt/scripts/env list | grep  --color=never ^\* | cut -d " " -f 2 | sed -r "s:\x1B\[[0-9;]*[mK]::g")
+VERSION=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+while getopts "a:m:r:" OPTION
+do
+  case $OPTION in
+  a)
+    ARCH=$OPTARG
+    ;;
+  m)
+    MODEL=$OPTARG
+    ;;
+  r)
+    VERSION=$OPTARG
+    ;;
+  ?)
+    exit
+    ;;
+  esac
+done
+
+case $MODEL in
+  tplink)
+   ARCH="ar71xx"
+   ;;
+  ac)
+   ARCH="bcm53xx"
+   ;;
+  x86)
+   ARCH="x86"
+   ;;
+  dlink)
+   ARCH="ath79"
+   ;;
+esac
+
+if [ -z $VERSION ]
+then
+  echo VERSIE niet opgegeven!
+  exit
+fi
+currdir=$(pwd)
+cd ~/Projects/openwrt
+make package/index
+
+case $VERSION in
+  v2)
+    case $ARCH in
+      ar71xx|bcm53xx|ath79)
+	cd bin/targets/$ARCH/generic/packages
+	scp -r * api:/var/www/dl/targets/$ARCH/generic/packages
+	;;
+      x86)
+	cd bin/targets/x86/64/packages
+	scp -r * api:/var/www/dl/targets/x86/64/packages
+	;;
+      * ) echo Skipped;;
+    esac
+    ;;
+  * )
+    case $ARCH in
+      ar71xx|bcm53xx|ath79)
+	cd bin/targets/$ARCH/generic/packages
+	scp -r * herman@gratwifi:apps/gratwifi/current/public/files/openwrt/targets/$ARCH/generic/packages
+	;;
+      x86)
+	cd bin/targets/x86/64/packages
+	scp -r * herman@gratwifi:apps/gratwifi/current/public/files/openwrt/targets/x86/64/packages
+	;;
+      * ) echo Skipped;;
+    esac
+
+esac
+
+cd $currdir

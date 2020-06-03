@@ -1,0 +1,41 @@
+GratWiFi
+========
+
+The 001_dir_842_leds.patch, changes the status led to the WPS led, apply on a
+new openwrt tree with: patch -p1 001_dir_842_leds.patch
+
+ParcWay
+-------
+Make sure the different my_feed projects are on the correct branch!
+Switch to the branch for the correct router.
+
+TL-WR1043N-family:
+./scripts/env switch tplink
+make ...
+./publish_firmware -m tplink
+./publish_packages -m tplink
+
+DIR-842 :
+./scripts/env switch parcway_ath79
+make ...
+./publish_firmware -m dlink
+./publish_packages -m dlink
+
+GratWiFi v2
+-----------
+Make sure the different my_feed projects are on the correct branch!
+Switch to the branch for the correct router.
+
+TL-WR1043N-family:
+./scripts/env switch v2
+make ...
+./publish_firmware -r v2 -m tplink
+./publish_packages -r v2 -m tplink
+
+DIR-842 :
+./scripts/env switch dlink
+make ...
+./publish_firmware -r v2 -a ath79
+./publish_packages -r v2 -m dlink
+
+
