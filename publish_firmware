@@ -1,6 +1,18 @@
-#!/bin/bash
+#!/bin/zsh
 
-BRANCH=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+current=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+B=("${(@s/_/)current}")
+BRANCH=$B[1]
+
+case $B[2] in
+  dlink)
+    ARCH="ath79"
+    ;;
+  tplink)
+    ARCH="ar71xx"
+    ;;
+  *)
+esac
 
 while getopts "a:r:" OPTION
 do
@@ -17,7 +29,7 @@ do
   esac
 done
 
-VERSION=1804
+VERSION=1907
 
 if [ -z $ARCH ]
 then

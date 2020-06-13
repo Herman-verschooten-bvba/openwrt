@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/bin/zsh
 
-#ARCH=$(~/Projects/openwrt/scripts/env list | grep  --color=never ^\* | cut -d " " -f 2 | sed -r "s:\x1B\[[0-9;]*[mK]::g")
-VERSION=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+current=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
+B=("${(@s/_/)current}")
+VERSION=$B[1]
+MODEL=$B[2]
+
 while getopts "a:m:r:" OPTION
 do
   case $OPTION in
