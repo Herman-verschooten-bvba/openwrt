@@ -13,14 +13,6 @@ LOADER_ENTRY = 0x80a00000		# RAM start + 10M, for relocate
 RAMSIZE = 0x02000000			# 32MB
 LZMA_TEXT_START = 0x81800000		# 32MB - 8MB
 
-LOADER_MAKEOPTS= \
-		KDIR=$(KDIR) \
-		LOADER_ADDR=$(LOADER_ENTRY) \
-		KERNEL_ADDR=$(KERNEL_LOADADDR) \
-		RAMSIZE=$(RAMSIZE) \
-		LZMA_TEXT_START=$(LZMA_TEXT_START) \
-		CHIP_ID=$(CHIP_ID)
-
 RELOCATE_MAKEOPTS= \
 		CACHELINE_SIZE=16 \
 		KERNEL_ADDR=$(KERNEL_LOADADDR) \
@@ -44,7 +36,12 @@ endef
 define Build/loader-lzma
 	rm -rf $@.src
 	$(MAKE) -C lzma-loader \
-		$(LOADER_MAKEOPTS) \
+		KDIR=$(KDIR) \
+		LOADER_ADDR=$(if $(DEVICE_LOADADDR),$(DEVICE_LOADADDR),$(LOADER_ENTRY)) \
+		KERNEL_ADDR=$(KERNEL_LOADADDR) \
+		RAMSIZE=$(RAMSIZE) \
+		LZMA_TEXT_START=$(LZMA_TEXT_START) \
+		CHIP_ID=$(CHIP_ID) \
 		PKG_BUILD_DIR="$@.src" \
 		TARGET_DIR="$(dir $@)" \
 		LOADER_DATA="$@" \
@@ -172,8 +169,8 @@ define Build/cfe-jffs2-kernel
 	$(TOPDIR)/scripts/cfe-bin-header.py \
 		--input-file $@ \
 		--output-file $@-kernel/vmlinux.lz \
-		--load-addr $(LOADER_ENTRY) \
-		--entry-addr $(LOADER_ENTRY)
+		--load-addr $(if $(DEVICE_LOADADDR),$(DEVICE_LOADADDR),$(LOADER_ENTRY)) \
+		--entry-addr $(if $(DEVICE_LOADADDR),$(DEVICE_LOADADDR),$(LOADER_ENTRY))
 
 	# The JFFS2 partition creation should result in the following
 	# layout:
@@ -218,20 +215,8 @@ define Build/cfe-sercomm-part
 		--part-name rootfs_lib \
 		--part-version $(SERCOMM_VERSION)
 
-	rm -rf $@-bootloader
-	mkdir -p $@-bootloader
-	cp $(KDIR)/bcm63xx-cfe/$(CFE_RAM_FILE) $@-bootloader/$(CFE_RAM_JFFS2_NAME)
-	$(call Build/cfe-jffs2,$@-bootloader)
-	$(call Build/pad-to,$(BLOCKSIZE))
-	$(TOPDIR)/scripts/sercomm-partition-tag.py \
-		--input-file $@ \
-		--output-file $@.bootloader \
-		--part-name bootloader \
-		--part-version $(SERCOMM_VERSION)
-
 	mv $@.kernel_rootfs $@
 	dd if=$@.rootfs_lib >> $@
-	dd if=$@.bootloader >> $@
 endef
 
 define Build/cfe-sercomm-load
@@ -322,15 +307,16 @@ define Device/Default
   CHIP_ID :=
   SOC = bcm$$(CHIP_ID)
   DEVICE_DTS = $$(SOC)-$(subst _,-,$(1))
+  DEVICE_LOADADDR :=
 endef
-DEVICE_VARS += CHIP_ID
+DEVICE_VARS += CHIP_ID DEVICE_LOADADDR
 
-ATH5K_PACKAGES := kmod-ath5k wpad-basic
-ATH9K_PACKAGES := kmod-ath9k wpad-basic
-B43_PACKAGES := kmod-b43 wpad-basic
+ATH5K_PACKAGES := kmod-ath5k wpad-basic-wolfssl
+ATH9K_PACKAGES := kmod-ath9k wpad-basic-wolfssl
+B43_PACKAGES := kmod-b43 wpad-basic-wolfssl
 BRCMWL_PACKAGES := kmod-brcm-wl nas wlc
-RT28_PACKAGES := kmod-rt2800-pci wpad-basic
-RT61_PACKAGES := kmod-rt61-pci wpad-basic
+RT28_PACKAGES := kmod-rt2800-pci wpad-basic-wolfssl
+RT61_PACKAGES := kmod-rt61-pci wpad-basic-wolfssl
 USB1_PACKAGES := kmod-usb-ohci kmod-usb-ledtrig-usbport
 USB2_PACKAGES := kmod-usb2 kmod-usb-ohci kmod-usb-ledtrig-usbport
 
