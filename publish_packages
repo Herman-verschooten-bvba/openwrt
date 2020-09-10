@@ -36,6 +36,9 @@ case $MODEL in
   dlink)
    ARCH="ath79"
    ;;
+  dwr921)
+   ARCH="ramips"
+   ;;
 esac
 
 if [ -z $VERSION ]
@@ -54,6 +57,10 @@ case $VERSION in
 	cd bin/targets/$ARCH/generic/packages
 	scp -r * api:/var/www/dl/targets/$ARCH/generic/packages
 	;;
+      ramips)
+	cd bin/targets/ramips/mt7620/packages
+	scp -r * api:/var/www/dl/targets/ramips/mt7620/packages
+	;;
       x86)
 	cd bin/targets/x86/64/packages
 	scp -r * api:/var/www/dl/targets/x86/64/packages
@@ -66,6 +73,10 @@ case $VERSION in
       ar71xx|bcm53xx|ath79)
 	cd bin/targets/$ARCH/generic/packages
 	scp -r * herman@gratwifi:apps/gratwifi/current/public/files/openwrt/targets/$ARCH/generic/packages
+	;;
+      ramips)
+	cd bin/targets/ramips/mt7620/packages
+	scp -r * herman@gratwifi:apps/gratwifi/current/public/files/openwrt/targets/ramips/mt7620/packages
 	;;
       x86)
 	cd bin/targets/x86/64/packages

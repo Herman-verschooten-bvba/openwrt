@@ -4,12 +4,18 @@ current=$(git --git-dir=./env/.git rev-parse --abbrev-ref HEAD)
 B=("${(@s/_/)current}")
 BRANCH=$B[1]
 
+SUBTYPE="generic"
+
 case $B[2] in
   dlink)
     ARCH="ath79"
     ;;
   tplink)
     ARCH="ar71xx"
+    ;;
+  dwr921)
+    ARCH="ramips"
+    SUBTYPE="mt7620"
     ;;
   *)
 esac
@@ -38,7 +44,7 @@ then
 fi
 
 currdir=$(pwd)
-cd ~/Projects/openwrt/bin/targets/$ARCH/generic
+cd ~/Projects/openwrt/bin/targets/$ARCH/$SUBTYPE
 pwd
 server="gratwifi:apps/gratwifi/current/public/files"
 case $BRANCH in
@@ -74,6 +80,11 @@ case $ARCH in
     scp gratwifi-ath79-generic-dlink_dir-842-c3-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-dlink_dir-842-c3.bin
     scp gratwifi-ath79-generic-tplink_archer-c7-v5-squashfs-factory.bin $server/firmware-$VERSION-tl-c7-v5.bin
     scp gratwifi-ath79-generic-tplink_archer-c7-v5-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-tl-c7-v5.bin
+    ;;
+  ramips)
+    scp gratwifi-ramips-mt7620-dlink_dwr-921-c3-squashfs-factory.bin $server/firmware-$VERSION-dlink_dwr-921-c3.bin
+    scp gratwifi-ramips-mt7620-dlink_dwr-921-c3-squashfs-sysupgrade.bin $server/sysupgrade-$VERSION-dlink_dwr-921-c3.bin
+    ;;
 esac
 
 cd $currdir
