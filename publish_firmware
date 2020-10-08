@@ -44,7 +44,7 @@ then
 fi
 
 currdir=$(pwd)
-cd ~/Projects/openwrt/bin/targets/$ARCH/$SUBTYPE
+cd ~/Projects/GratWiFi_v1/bin/targets/$ARCH/$SUBTYPE
 pwd
 server="gratwifi:apps/gratwifi/current/public/files"
 case $BRANCH in
