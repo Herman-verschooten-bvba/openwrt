@@ -47,7 +47,7 @@ then
   exit
 fi
 currdir=$(pwd)
-cd ~/Projects/openwrt
+cd ~/Projects/GratWiFi_v1
 make package/index
 
 case $VERSION in
